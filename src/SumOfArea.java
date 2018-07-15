@@ -1,82 +1,44 @@
+import java.util.Stack;
 
 public class SumOfArea {
 
 	private int[] area;
     private int step;
     private long sumOfArea;
-	private Thread[] listThread = new Thread[0];
-    private SumOfPartTheArea[] listClasses = new SumOfPartTheArea[0];
+	private Stack<Thread> stack = new Stack<Thread>();
+    private Memory memory;
 	
-	public SumOfArea(int[] area, int step) {
+	public SumOfArea(int[] area, int step, Memory memory) {
 		super();
 		this.area = area;
 		this.step = step;
+		this.memory = memory;
 	}
 	
-	private void addThreads(Thread[] list, Thread thr) {
-		if(thr == null) {
-			throw new NullPointerException();
-		}
-		for(int i = 0; i < list.length; i++) {
-			if(list[i] == null) {
-				list[i] = thr;
-				return;
+	
+	public long sumOfArea() {
+		int rest = area.length % step;
+		
+		for(int i = 0; i < area.length; i += step) {
+			if(i + step < area.length) {
+				SumOfPartTheArea sum = new SumOfPartTheArea(area, i , i + step , memory);
+				Thread thr = new Thread(sum);
+				thr.start();
+				stack.push(thr);
 			}
-			Thread[] newList = new Thread[list.length + 1];
-			newList = list;
-			addThreads(newList, thr);
 		}
-	}
-	
-	private void addClasses(SumOfPartTheArea[] list, SumOfPartTheArea sum) {
-		if(sum == null) {
-			throw new NullPointerException();
+		for(int i = area.length - rest; i < area.length; i++) {
+			sumOfArea += area[i];
 		}
-		for(int i = 0; i < list.length; i++) {
-			if(list[i] == null) {
-				list[i] = sum;
-				return;
-			}
-			SumOfPartTheArea[] newList = new SumOfPartTheArea[list.length + 1];
-			newList = list;
-			addClasses(newList, sum);
-		}
-	}
-	
-	private void startThreads() {
-		for(int i = 0; i < listClasses.length; i++) {
-			Thread thr = new Thread(listClasses[i]);
-			addThreads(listThread,thr);
-		}
-		for(int i = 0; i < listThread.length; i++) {
-			listThread[i].start();
-		}
-		for(int i = 0; i < listThread.length; i++) {
+		memory.setMemory(sumOfArea);
+		for(int i = 0; i < stack.size(); i++) {
 			try {
-				listThread[i].join();
+				stack.pop().join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		for(int i = 0; i < listThread.length; i++) {
-			sumOfArea += listClasses[i].getSum();
-		}
-	}
-	
-	public long sumOfArea() {
-		int numberOfThreads = area.length / step;
-		int rest = area.length % step;
-		int countSteps = 0;
-		
-		for(int i = 0; i <= numberOfThreads; i++) {
-			SumOfPartTheArea sum = new SumOfPartTheArea(area, i * countSteps , i + step * countSteps );
-			addClasses(listClasses, sum);
-		}
-		startThreads();
-		for(int i = area.length; i > area.length - rest; i--) {
-			sumOfArea += area[i];
-		}
-		return sumOfArea;
+		return memory.getMemory();
 	}
 	
 }

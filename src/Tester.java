@@ -14,11 +14,13 @@ public class Tester {
 		}
 	}
 	static void Test_2() {
+		long sum;
 		int[] area = new int[10];
 		for(int i = 0; i < area.length; i++) {
 			area[i] = i;
 		}
-		SumOfArea sum = new SumOfArea(area, 2);
-		System.out.println(sum.sumOfArea());
+		SumOfArea sof = new SumOfArea(area, 4, new Memory());
+		sum = sof.sumOfArea();
+		System.out.println(sum);
 	}
 }

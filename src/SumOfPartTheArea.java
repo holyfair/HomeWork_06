@@ -5,21 +5,20 @@ public class SumOfPartTheArea implements Runnable{
 	private int from;
 	private int to;
 	private long sum = 0;
+	Memory memory;
 	
-	public long getSum() {
-		return sum;
-	}
 
-	public SumOfPartTheArea(int[] area, int from, int to) {
+	public SumOfPartTheArea(int[] area, int from, int to, Memory memory) {
 		super();
 		this.area = area;
 		this.from = from;
 		this.to = to;
+		this.memory = memory;
 	}
 
     private void countSum() {
     	for(int i = from; i < to; i++) {
-    		sum += area[i];
+    		sum = sum + area[i];
     	}
     	
     }
@@ -27,6 +26,8 @@ public class SumOfPartTheArea implements Runnable{
 	@Override
 	public void run() {
 		countSum();
+		memory.setMemory(sum);
+		System.out.println(sum);
 	}
 
 }
